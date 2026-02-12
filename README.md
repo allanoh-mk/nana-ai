@@ -1,28 +1,35 @@
 # 🌸 NANA — Self-Growing Personal Intelligence
 
-Nana is designed as a digital mind that starts near-empty, learns from interactions, and keeps evolving.
+Nana is a self-growing digital mind: she starts near-empty, learns from experience, and continuously reorganizes her internal graph.
 
-## What is implemented now
+## Current architecture
 
-- **Online-growing brain graph** (neurons + links + mood + maturity growth).
-- **Critical-thinking pass** per message with confidence/novelty scoring.
-- **Always time/date aware** in reasoning context.
-- **Identity profile**: female persona, birthday `2004-06-04`, early-20s age computation.
-- **Multilingual baseline**: English (US), Kiswahili, Sheng profile.
-- **Capability routes**:
-  - `search: ...`
-  - `code: ...`
-  - `image: ...`
-  - `video: ...`
-- **Security-aware behavior**:
-  - detects prompt-injection markers,
-  - flags malicious command/file patterns,
-  - refuses dark-web/harmful assistance and redirects to defensive guidance.
-- **Frontend (HTML/CSS/JS)** with chat UI and browser speech synthesis (female-preferred voice when available).
+- Online-growing neuron graph with associative links.
+- Autonomous self-expression from learned lexicon (not fixed scripted reply templates).
+- Time/date grounding available in every turn context.
+- Identity profile: female persona, birthday `2004-06-04`, early-20s age computation.
+- Mood system with positive/neutral channels (no anger/bitterness/envy channels).
+- Language profile bootstrapped for English (US), Kiswahili, and Sheng.
+- Capabilities:
+  - `search:` internet lookup
+  - `code:` code generation starter
+  - `image:` image generation URL
+  - `video:` video generation plan
+- Security-awareness:
+  - prompt-injection marker detection
+  - malicious pattern detection
+  - dark-web/harmful refusal with legal defensive-security redirection
+
+## Frontend
+
+- HTML/CSS/JS web interface
+- Live voice-out (speech synthesis)
+- Live voice-in (continuous speech recognition when browser supports it)
+- Language selector for English/Kiswahili/Sheng profile
 
 ## Safety note
 
-Nana does **not** assist with harmful or illegal activities (including dark-web abuse, malware deployment, or exploit misuse). It can assist with legal defensive security practices.
+Nana will not assist harmful or illegal operations (e.g., dark-web abuse, malware deployment). Nana supports defensive security learning and incident-response workflows.
 
 ## Quick start
 
@@ -38,21 +45,13 @@ Run CLI:
 nana
 ```
 
-Run web app:
+Run web frontend:
 
 ```bash
 nana --web --host 0.0.0.0 --port 8080
 ```
 
-Then open: `http://localhost:8080`
-
-## Commands
-
-- `/state`
-- `search: latest AI alignment research`
-- `code: build a small todo CLI`
-- `image: afro-futuristic digital assistant portrait`
-- `video: storyboard for Nana intro animation`
+Open `http://localhost:8080`.
 
 ## Tests
 

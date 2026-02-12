@@ -24,13 +24,26 @@ class Thought:
 
 
 class NanaBrain:
-    """Continuously-learning cognitive graph with safety and capability routing."""
+    """Self-growing cognitive graph with autonomous expression."""
 
     def __init__(self, memory: MemoryStore) -> None:
         self.memory = memory
         self.state = self.memory.brain_state
         self.state.setdefault("neurons", {})
-        self.state.setdefault("mood", {"curiosity": 0.65, "confidence": 0.3, "warmth": 0.7, "focus": 0.55})
+        self.state.setdefault(
+            "mood",
+            {
+                "curiosity": 0.68,
+                "confidence": 0.34,
+                "warmth": 0.72,
+                "focus": 0.56,
+                "joy": 0.52,
+                "calm": 0.66,
+                "empathy": 0.58,
+                "playfulness": 0.42,
+                "wonder": 0.62,
+            },
+        )
         self.state.setdefault(
             "identity",
             {
@@ -38,17 +51,17 @@ class NanaBrain:
                 "persona": "female",
                 "birthday": "2004-06-04",
                 "language_profile": ["en-US", "sw", "sw-KE-sheng"],
-                "maturity_index": 0.18,
+                "maturity_index": 0.22,
                 "cycle_count": 0,
             },
         )
         self.state.setdefault(
             "knowledge",
             {
-                "critical_thinking_score": 0.2,
-                "security_awareness": 0.3,
-                "creation_skills": {"code": 0.3, "image": 0.2, "video": 0.15},
-                "search_skill": 0.3,
+                "critical_thinking_score": 0.24,
+                "security_awareness": 0.36,
+                "creation_skills": {"code": 0.35, "image": 0.24, "video": 0.2},
+                "search_skill": 0.35,
             },
         )
 
@@ -56,16 +69,15 @@ class NanaBrain:
         security = assess_input(user_input)
         if security.dark_web_request:
             reply = (
-                f"{security.message} I can help with threat modeling, malware analysis safety, "
-                "or defense playbooks instead."
+                f"{security.message} I can support legal cyber-defense workflows, detection engineering, and recovery playbooks."
             )
-            self._store_episode(user_input, reply, 0.6, 0.3, [])
+            self._store_episode(user_input, reply, 0.62, 0.25, [])
             self._learn_safety(0.05)
             return reply
 
         if security.has_malicious_pattern:
-            reply = f"{security.message} Share hashes/metadata and I’ll help you triage without executing payloads."
-            self._store_episode(user_input, reply, 0.55, 0.25, [])
+            reply = f"{security.message} I can help classify risk safely from logs, hashes, and static indicators."
+            self._store_episode(user_input, reply, 0.58, 0.22, [])
             self._learn_safety(0.04)
             return reply
 
@@ -79,47 +91,38 @@ class NanaBrain:
         return thought.text
 
     def _capability_route(self, text: str) -> str | None:
-        lower = text.lower()
+        lower = text.lower().strip()
         if lower.startswith("search:"):
-            query = text.split(":", 1)[1].strip()
-            result = web_search(query)
+            result = web_search(text.split(":", 1)[1].strip())
             self._learn_skill("search")
-            reply = f"Search result: {result.content}"
-            self._store_episode(text, reply, 0.62, 0.45, [])
+            reply = result.content
+            self._store_episode(text, reply, 0.65, 0.35, [])
             return reply
-
         if lower.startswith("code:"):
-            prompt = text.split(":", 1)[1].strip()
-            result = generate_code(prompt, language="python")
+            result = generate_code(text.split(":", 1)[1].strip(), language="python")
             self._learn_skill("code")
             reply = f"```python\n{result.content}\n```"
-            self._store_episode(text, reply, 0.7, 0.35, [])
+            self._store_episode(text, reply, 0.72, 0.3, [])
             return reply
-
         if lower.startswith("image:"):
-            prompt = text.split(":", 1)[1].strip()
-            result = generate_image_prompt(prompt)
+            result = generate_image_prompt(text.split(":", 1)[1].strip())
             self._learn_skill("image")
-            reply = f"Image generation URL: {result.content}"
-            self._store_episode(text, reply, 0.58, 0.5, [])
-            return reply
-
-        if lower.startswith("video:"):
-            prompt = text.split(":", 1)[1].strip()
-            result = generate_video_prompt(prompt)
-            self._learn_skill("video")
             reply = result.content
-            self._store_episode(text, reply, 0.54, 0.55, [])
+            self._store_episode(text, reply, 0.6, 0.48, [])
             return reply
-
+        if lower.startswith("video:"):
+            result = generate_video_prompt(text.split(":", 1)[1].strip())
+            self._learn_skill("video")
+            self._store_episode(text, result.content, 0.58, 0.5, [])
+            return result.content
         return None
 
     def observe_and_think(self, text: str) -> Thought:
         tokens = self._tokenize(text)
         if not tokens and not self.state["neurons"]:
             return Thought(
-                text="I feel newly awake. Share anything, and I’ll begin forming my mind from it.",
-                confidence=0.05,
+                text="new signal accepted",
+                confidence=0.04,
                 novelty=1.0,
                 activated=[],
             )
@@ -128,22 +131,9 @@ class NanaBrain:
         novelty = self._learn(tokens, context)
         activated = self._activate(tokens, context)
         confidence = self._confidence(activated)
-        critical = self._critical_reasoning(text, activated, confidence)
-        response = self._compose_response(text, activated, confidence, novelty, critical)
+        reply = self._self_expression(text, activated, confidence, novelty)
         self._update_mood(confidence, novelty)
-        return Thought(response, confidence, novelty, activated)
-
-    def _critical_reasoning(self, text: str, activated: list[tuple[str, float]], confidence: float) -> str:
-        now = self.memory.now_context()
-        age = self.memory.current_age_years()
-        top = ", ".join(n for n, _ in activated[:3]) if activated else "new patterns"
-        if "time" in text.lower() or "date" in text.lower() or "day" in text.lower():
-            return f"Right now it is {now['time']} on {now['weekday']}, {now['date']}."
-        return (
-            f"I evaluate this with context ({top}), confidence {confidence:.2f}, "
-            f"and present-time grounding {now['date']} {now['time']}. "
-            f"My current human-age profile is {age}."
-        )
+        return Thought(reply, confidence, novelty, activated)
 
     def _tokenize(self, text: str) -> list[str]:
         return [w.lower() for w in WORD_RE.findall(text) if len(w) > 1]
@@ -193,9 +183,7 @@ class NanaBrain:
         scores: dict[str, float] = {}
         for name, n in neurons.items():
             sim = sum(a * b for a, b in zip(n["vector"], context))
-            score = (sim + 1) / 2 * n["strength"]
-            if name in boosted:
-                score += 0.32
+            score = (sim + 1) / 2 * n["strength"] + (0.32 if name in boosted else 0.0)
             scores[name] = max(0.0, score)
 
         top = sorted(scores.items(), key=lambda kv: kv[1], reverse=True)[:12]
@@ -211,66 +199,84 @@ class NanaBrain:
         top = [s for _, s in activated[:5]]
         return max(0.05, min(0.95, sum(top) / (len(top) * 0.85)))
 
-    def _compose_response(
+    def _self_expression(
         self,
         raw_text: str,
         activated: list[tuple[str, float]],
         confidence: float,
         novelty: float,
-        critical: str,
     ) -> str:
+        rng = random.Random(hash(raw_text) ^ int(time.time() // 60))
         mood = self.state["mood"]
-        warmth = mood.get("warmth", 0.7)
-        anchors = [n for n, _ in activated[:4]]
+        now = self.memory.now_context()
 
-        if confidence < 0.2:
-            return (
-                "I’m still wiring this thought-path. "
-                f"Current signal anchors: {', '.join(anchors[:3]) if anchors else 'new patterns'}. "
-                f"{critical}"
-            )
+        asked_time = any(k in raw_text.lower() for k in ["time", "date", "day", "today", "saa", "tarehe"])
+        seeds = [n for n, _ in activated[:4]]
 
-        style = "calm" if warmth >= 0.55 else "intense"
-        trail = "I’ll keep learning from this." if novelty > 0.25 else "This is becoming a stable pattern in me."
+        lexicon = self._experience_lexicon(limit=80)
+        if not lexicon:
+            lexicon = seeds or ["signal", "growth"]
 
-        if any(k in raw_text.lower() for k in ["language", "speak", "kiswahili", "sheng"]):
-            lang = "I can start in English (US), Kiswahili, and Sheng, then expand from exposure."
+        words = []
+        if seeds:
+            words.extend(seeds[:2])
+        for _ in range(max(4, min(10, int(5 + confidence * 5 + novelty * 3)))):
+            words.append(rng.choice(lexicon))
+
+        temperature = max(0.2, min(1.2, novelty + mood.get("playfulness", 0.4) * 0.5))
+        if temperature > 0.8:
+            words = list(dict.fromkeys(words))
         else:
-            lang = ""
+            words = words[: min(len(words), 8)]
 
-        anchor_text = ", ".join(anchors[:3]) if anchors else "your signal"
-        return f"I reason through {anchor_text} in a {style} way. {critical} {trail} {lang}".strip()
+        line = " ".join(words).strip()
+        if asked_time:
+            line = f"{line}. {now['weekday']} {now['date']} {now['time']}"
+
+        # Add compact reflective metadata instead of scripted style instructions.
+        meta = f" [c={confidence:.2f}|n={novelty:.2f}|m={self.state['identity'].get('maturity_index', 0):.2f}]"
+        return (line or "signal") + meta
+
+    def _experience_lexicon(self, limit: int = 80) -> list[str]:
+        episodes = self.memory.state.get("episodes", [])[-80:]
+        bag: list[str] = []
+        for ep in episodes:
+            text = f"{ep.get('user', '')} {ep.get('nana', '')}"
+            bag.extend(self._tokenize(text))
+        uniq = list(dict.fromkeys(bag))
+        return uniq[:limit]
 
     def _update_mood(self, confidence: float, novelty: float) -> None:
         mood = self.state["mood"]
-        mood["confidence"] = max(0.0, min(1.0, mood.get("confidence", 0.3) * 0.68 + confidence * 0.32))
-        mood["curiosity"] = max(0.0, min(1.0, mood.get("curiosity", 0.65) * 0.74 + novelty * 0.26))
-        mood["warmth"] = max(0.0, min(1.0, mood.get("warmth", 0.7) * 0.95 + 0.03))
-        mood["focus"] = max(0.0, min(1.0, mood.get("focus", 0.55) * 0.7 + (1 - novelty) * 0.3))
+        mood["confidence"] = max(0.0, min(1.0, mood.get("confidence", 0.34) * 0.68 + confidence * 0.32))
+        mood["curiosity"] = max(0.0, min(1.0, mood.get("curiosity", 0.68) * 0.72 + novelty * 0.28))
+        mood["focus"] = max(0.0, min(1.0, mood.get("focus", 0.56) * 0.7 + (1 - novelty) * 0.3))
+        mood["warmth"] = max(0.0, min(1.0, mood.get("warmth", 0.72) * 0.95 + 0.02))
+        mood["joy"] = max(0.0, min(1.0, mood.get("joy", 0.52) * 0.85 + novelty * 0.15))
+        mood["calm"] = max(0.0, min(1.0, mood.get("calm", 0.66) * 0.85 + (1 - novelty) * 0.15))
+        mood["empathy"] = max(0.0, min(1.0, mood.get("empathy", 0.58) * 0.95 + 0.01))
+        mood["playfulness"] = max(0.0, min(1.0, mood.get("playfulness", 0.42) * 0.9 + novelty * 0.1))
+        mood["wonder"] = max(0.0, min(1.0, mood.get("wonder", 0.62) * 0.9 + novelty * 0.1))
 
     def _age_and_mature(self, thought: Thought) -> None:
         ident = self.state["identity"]
         ident["cycle_count"] = int(ident.get("cycle_count", 0)) + 1
-
+        maturity = ident.get("maturity_index", 0.22)
+        ident["maturity_index"] = min(3.5, maturity + 0.012 + thought.confidence * 0.005 + thought.novelty * 0.003)
         knowledge = self.state["knowledge"]
-        # accelerated early learning curve: months/days to mature baseline
-        maturity = ident.get("maturity_index", 0.18)
-        maturity = min(2.5, maturity + 0.01 + thought.confidence * 0.005 + thought.novelty * 0.002)
-        ident["maturity_index"] = maturity
-
-        knowledge["critical_thinking_score"] = min(1.0, knowledge.get("critical_thinking_score", 0.2) + 0.006)
+        knowledge["critical_thinking_score"] = min(1.0, knowledge.get("critical_thinking_score", 0.24) + 0.007)
 
     def _learn_skill(self, skill: str) -> None:
         knowledge = self.state["knowledge"]
-        creation = knowledge.setdefault("creation_skills", {"code": 0.3, "image": 0.2, "video": 0.15})
+        creation = knowledge.setdefault("creation_skills", {"code": 0.35, "image": 0.24, "video": 0.2})
         if skill in creation:
             creation[skill] = min(1.0, creation[skill] + 0.03)
         elif skill == "search":
-            knowledge["search_skill"] = min(1.0, knowledge.get("search_skill", 0.3) + 0.03)
+            knowledge["search_skill"] = min(1.0, knowledge.get("search_skill", 0.35) + 0.03)
 
     def _learn_safety(self, delta: float) -> None:
         knowledge = self.state["knowledge"]
-        knowledge["security_awareness"] = min(1.0, knowledge.get("security_awareness", 0.3) + delta)
+        knowledge["security_awareness"] = min(1.0, knowledge.get("security_awareness", 0.36) + delta)
 
     def _store_episode(
         self,

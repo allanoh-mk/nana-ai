@@ -11,21 +11,31 @@ DEFAULT_MEMORY: dict[str, Any] = {
     "episodes": [],
     "brain_state": {
         "neurons": {},
-        "mood": {"curiosity": 0.65, "confidence": 0.3, "warmth": 0.7, "focus": 0.55},
+        "mood": {
+            "curiosity": 0.68,
+            "confidence": 0.34,
+            "warmth": 0.72,
+            "focus": 0.56,
+            "joy": 0.52,
+            "calm": 0.66,
+            "empathy": 0.58,
+            "playfulness": 0.42,
+            "wonder": 0.62,
+        },
         "identity": {
             "name": "Nana",
             "persona": "female",
             "birthday": "2004-06-04",
-            "self_description": "Curious, protective, growth-driven digital mind.",
-            "maturity_index": 0.18,
+            "self_description": "A self-growing digital mind.",
+            "maturity_index": 0.22,
             "cycle_count": 0,
             "language_profile": ["en-US", "sw", "sw-KE-sheng"],
         },
         "knowledge": {
-            "critical_thinking_score": 0.2,
-            "security_awareness": 0.3,
-            "creation_skills": {"code": 0.3, "image": 0.2, "video": 0.15},
-            "search_skill": 0.3,
+            "critical_thinking_score": 0.24,
+            "security_awareness": 0.36,
+            "creation_skills": {"code": 0.35, "image": 0.24, "video": 0.2},
+            "search_skill": 0.35,
         },
     },
 }
@@ -43,11 +53,9 @@ class MemoryStore:
             loaded = json.loads(memory_path.read_text(encoding="utf-8"))
             state = json.loads(json.dumps(DEFAULT_MEMORY))
             state.update(loaded)
-
             loaded_brain = loaded.get("brain_state", {}) if isinstance(loaded, dict) else {}
             if isinstance(loaded_brain, dict):
                 state["brain_state"].update(loaded_brain)
-
             return cls(path=memory_path, state=state)
         return cls(path=memory_path)
 
@@ -73,7 +81,6 @@ class MemoryStore:
 
     def current_age_years(self) -> int:
         ident = self.brain_state.setdefault("identity", {})
-        birthday = ident.get("birthday", "2004-06-04")
-        born = date.fromisoformat(birthday)
+        born = date.fromisoformat(ident.get("birthday", "2004-06-04"))
         today = date.today()
         return today.year - born.year - ((today.month, today.day) < (born.month, born.day))

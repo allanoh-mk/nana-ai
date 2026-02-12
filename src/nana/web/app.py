@@ -67,7 +67,7 @@ def run_web(host: str = "0.0.0.0", port: int = 8080, memory_path: str = "data/me
 
     server = ThreadingHTTPServer((host, port), NanaWebHandler)
     print(f"Nana web running at http://{host}:{port}")
-    print("Female voice mode: frontend SpeechSynthesis chooses female-preferred voice when available.")
+    print("Voice mode: live speech-in/out handled in browser when supported.")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

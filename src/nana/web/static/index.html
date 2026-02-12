@@ -9,7 +9,7 @@
 <body>
   <main class="shell">
     <h1>🌸 Nana Mind Console</h1>
-    <p class="sub">Languages: English (US), Kiswahili, Sheng. Voice: female-preferred.</p>
+    <p class="sub">Live voice chat + self-growing cognition.</p>
 
     <section class="controls">
       <label>
@@ -20,21 +20,20 @@
           <option value="sw-KE">Sheng / Kenya Mix</option>
         </select>
       </label>
-      <label>
-        Voice
-        <input type="checkbox" id="voiceToggle" checked /> Speak replies
-      </label>
+      <label><input type="checkbox" id="voiceOutToggle" checked /> Voice out</label>
+      <label><input type="checkbox" id="voiceInToggle" /> Live voice in</label>
+      <button id="voiceBtn" type="button">🎙 Start Listening</button>
     </section>
 
     <section id="chat" class="chat"></section>
 
     <form id="chatForm" class="row">
-      <input id="message" placeholder="Talk to Nana... try 'time now', 'search: quantum computing', 'code: todo app'" />
+      <input id="message" placeholder="Talk to Nana..." />
       <button type="submit">Send</button>
     </form>
 
     <section class="capabilities">
-      <p><b>Commands:</b> <code>search:</code> <code>code:</code> <code>image:</code> <code>video:</code></p>
+      <p><b>Capabilities:</b> <code>search:</code> <code>code:</code> <code>image:</code> <code>video:</code></p>
     </section>
   </main>
   <script src="/app.js"></script>

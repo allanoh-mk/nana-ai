@@ -1,8 +1,13 @@
 const form = document.getElementById('chatForm');
 const input = document.getElementById('message');
 const chat = document.getElementById('chat');
-const voiceToggle = document.getElementById('voiceToggle');
+const voiceOutToggle = document.getElementById('voiceOutToggle');
+const voiceInToggle = document.getElementById('voiceInToggle');
+const voiceBtn = document.getElementById('voiceBtn');
 const langSelect = document.getElementById('langSelect');
+
+let recognition = null;
+let listening = false;
 
 function addMsg(role, text){
   const div = document.createElement('div');
@@ -13,7 +18,7 @@ function addMsg(role, text){
 }
 
 function speak(text){
-  if(!voiceToggle.checked || !window.speechSynthesis) return;
+  if(!voiceOutToggle.checked || !window.speechSynthesis) return;
   const u = new SpeechSynthesisUtterance(text);
   u.lang = langSelect.value;
   const voices = speechSynthesis.getVoices();
@@ -23,13 +28,8 @@ function speak(text){
   speechSynthesis.speak(u);
 }
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const message = input.value.trim();
-  if(!message) return;
+async function sendMessage(message){
   addMsg('you', message);
-  input.value = '';
-
   const res = await fetch('/api/chat', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -38,6 +38,79 @@ form.addEventListener('submit', async (e) => {
   const data = await res.json();
   addMsg('nana', data.reply);
   speak(data.reply);
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const message = input.value.trim();
+  if(!message) return;
+  input.value = '';
+  await sendMessage(message);
 });
 
-addMsg('nana', 'I am awake. I know current time/date context and I keep growing each interaction.');
+function setupRecognition(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition) {
+    voiceBtn.disabled = true;
+    voiceBtn.textContent = '🎙 Unsupported';
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang = langSelect.value;
+  recognition.continuous = true;
+  recognition.interimResults = false;
+
+  recognition.onresult = async (event) => {
+    const last = event.results[event.results.length - 1];
+    const transcript = last[0].transcript.trim();
+    if(transcript) await sendMessage(transcript);
+  };
+
+  recognition.onend = () => {
+    if(listening && voiceInToggle.checked) {
+      recognition.lang = langSelect.value;
+      recognition.start();
+    }
+  };
+}
+
+voiceBtn.addEventListener('click', () => {
+  if(!recognition) return;
+  listening = !listening;
+  if(listening) {
+    recognition.lang = langSelect.value;
+    recognition.start();
+    voiceBtn.textContent = '🛑 Stop Listening';
+    voiceInToggle.checked = true;
+  } else {
+    recognition.stop();
+    voiceBtn.textContent = '🎙 Start Listening';
+    voiceInToggle.checked = false;
+  }
+});
+
+voiceInToggle.addEventListener('change', () => {
+  if(!recognition) return;
+  if(voiceInToggle.checked && !listening) {
+    listening = true;
+    recognition.lang = langSelect.value;
+    recognition.start();
+    voiceBtn.textContent = '🛑 Stop Listening';
+  }
+  if(!voiceInToggle.checked && listening) {
+    listening = false;
+    recognition.stop();
+    voiceBtn.textContent = '🎙 Start Listening';
+  }
+});
+
+langSelect.addEventListener('change', () => {
+  if(recognition && listening) {
+    recognition.stop();
+    recognition.lang = langSelect.value;
+    recognition.start();
+  }
+});
+
+setupRecognition();
+addMsg('nana', 'signal ready');
