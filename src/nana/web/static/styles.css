@@ -1,0 +1,14 @@
+:root { color-scheme: dark; }
+body { margin:0; font-family: Inter, system-ui, sans-serif; background:#0b0d12; color:#e8edf8; }
+.shell { max-width: 960px; margin: 24px auto; padding: 16px; }
+h1 { margin:0 0 8px; }
+.sub { color:#a6b1c7; margin-bottom: 14px; }
+.controls { display:flex; gap:14px; margin-bottom:12px; flex-wrap: wrap; align-items: center; }
+.chat { border:1px solid #27314a; border-radius:12px; min-height:340px; padding:12px; background:#111827; }
+.msg { margin:8px 0; padding:8px 10px; border-radius:10px; line-height: 1.35; }
+.you { background:#1f2937; }
+.nana { background:#312e81; }
+.row { margin-top:12px; display:flex; gap:10px; }
+input { flex:1; padding:10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:white; }
+button { padding:10px 14px; border-radius:8px; border:none; background:#6366f1; color:white; cursor:pointer; }
+.capabilities { margin-top:8px; color:#aeb9d1; }
