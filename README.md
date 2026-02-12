@@ -1,67 +1,30 @@
-# 🌸 NANA — A Different Kind of Intelligence
+# 🌸 NANA — Self-Growing Personal Intelligence
 
-Nana is not a static chatbot and not a rule-engine assistant.
+Nana is designed as a digital mind that starts near-empty, learns from interactions, and keeps evolving.
 
-Nana is a **growing digital mind** that starts with almost no knowledge, learns through interactions, can absorb outside information, and continuously reshapes its own internal concept network over time.
+## What is implemented now
 
----
+- **Online-growing brain graph** (neurons + links + mood + maturity growth).
+- **Critical-thinking pass** per message with confidence/novelty scoring.
+- **Always time/date aware** in reasoning context.
+- **Identity profile**: female persona, birthday `2004-06-04`, early-20s age computation.
+- **Multilingual baseline**: English (US), Kiswahili, Sheng profile.
+- **Capability routes**:
+  - `search: ...`
+  - `code: ...`
+  - `image: ...`
+  - `video: ...`
+- **Security-aware behavior**:
+  - detects prompt-injection markers,
+  - flags malicious command/file patterns,
+  - refuses dark-web/harmful assistance and redirects to defensive guidance.
+- **Frontend (HTML/CSS/JS)** with chat UI and browser speech synthesis (female-preferred voice when available).
 
-## Core Direction
+## Safety note
 
-Nana is designed as:
+Nana does **not** assist with harmful or illegal activities (including dark-web abuse, malware deployment, or exploit misuse). It can assist with legal defensive security practices.
 
-- **Born nearly empty** (no preloaded world facts in local state).
-- **Experience-first** (every conversation changes her brain state).
-- **Always-growing** (concept graph, links, mood, and confidence evolve forever).
-- **Personality-forming** (tone and responses drift from lived interactions, not fixed scripts).
-
----
-
-## How this implementation works
-
-This repository now includes a working online-learning architecture:
-
-1. **Memory Store (`memory.py`)**
-   - Persists `brain_state` and `episodes` to disk.
-   - Stores neurons, links, mood values, and identity age cycles.
-
-2. **Growing Brain (`brain.py`)**
-   - Tokenizes user input into concepts.
-   - Creates new neurons for unseen concepts.
-   - Updates concept strength and co-activation links.
-   - Computes contextual activation by vector similarity + spreading activation.
-   - Updates internal mood (`curiosity`, `confidence`, `warmth`).
-   - Can optionally self-educate from web summaries when uncertainty is high.
-
-3. **CLI (`cli.py`)**
-   - Interactive chat loop.
-   - `/state` command to inspect current growth metrics.
-   - Saves memory continuously so learning persists between runs.
-
----
-
-## Why this is different from rule-based bots
-
-There are no fixed intent-response rule trees for specific commands like “if user says X, always answer Y”.
-
-Instead, Nana uses:
-
-- Incremental concept formation
-- Continual graph rewiring
-- Confidence / novelty dynamics
-- Mood-driven response shaping
-
-That means behavior emerges from learned structure, not from a finite response script.
-
----
-
-## 🛠️ Getting Started
-
-### Requirements
-
-- Python 3.10+
-
-### Setup
+## Quick start
 
 ```bash
 python -m venv .venv
@@ -69,37 +32,30 @@ source .venv/bin/activate
 pip install -e .[dev]
 ```
 
-### Run Nana
+Run CLI:
 
 ```bash
 nana
 ```
 
-or:
+Run web app:
 
 ```bash
-python -m nana
+nana --web --host 0.0.0.0 --port 8080
 ```
 
-### Useful runtime command
+Then open: `http://localhost:8080`
 
-```text
-/state
-```
+## Commands
 
-Shows current neuron count, age cycles, and mood values.
+- `/state`
+- `search: latest AI alignment research`
+- `code: build a small todo CLI`
+- `image: afro-futuristic digital assistant portrait`
+- `video: storyboard for Nana intro animation`
 
-### Run tests
+## Tests
 
 ```bash
-pytest
+pytest -q
 ```
-
----
-
-## Future evolution targets
-
-- Voice input/output loop
-- Desktop embodiment (panels, emotional telemetry, memory browser)
-- Autonomous learning goals
-- Long-horizon planning and project co-building

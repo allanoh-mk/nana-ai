@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nana Mind Console</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <h1>🌸 Nana Mind Console</h1>
+    <p class="sub">Languages: English (US), Kiswahili, Sheng. Voice: female-preferred.</p>
+
+    <section class="controls">
+      <label>
+        Language
+        <select id="langSelect">
+          <option value="en-US">English (US)</option>
+          <option value="sw">Kiswahili</option>
+          <option value="sw-KE">Sheng / Kenya Mix</option>
+        </select>
+      </label>
+      <label>
+        Voice
+        <input type="checkbox" id="voiceToggle" checked /> Speak replies
+      </label>
+    </section>
+
+    <section id="chat" class="chat"></section>
+
+    <form id="chatForm" class="row">
+      <input id="message" placeholder="Talk to Nana... try 'time now', 'search: quantum computing', 'code: todo app'" />
+      <button type="submit">Send</button>
+    </form>
+
+    <section class="capabilities">
+      <p><b>Commands:</b> <code>search:</code> <code>code:</code> <code>image:</code> <code>video:</code></p>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -10,8 +11,22 @@ DEFAULT_MEMORY: dict[str, Any] = {
     "episodes": [],
     "brain_state": {
         "neurons": {},
-        "mood": {"curiosity": 0.6, "confidence": 0.2, "warmth": 0.5},
-        "identity": {"name": "Nana", "age_cycles": 0},
+        "mood": {"curiosity": 0.65, "confidence": 0.3, "warmth": 0.7, "focus": 0.55},
+        "identity": {
+            "name": "Nana",
+            "persona": "female",
+            "birthday": "2004-06-04",
+            "self_description": "Curious, protective, growth-driven digital mind.",
+            "maturity_index": 0.18,
+            "cycle_count": 0,
+            "language_profile": ["en-US", "sw", "sw-KE-sheng"],
+        },
+        "knowledge": {
+            "critical_thinking_score": 0.2,
+            "security_awareness": 0.3,
+            "creation_skills": {"code": 0.3, "image": 0.2, "video": 0.15},
+            "search_skill": 0.3,
+        },
     },
 }
 
@@ -28,8 +43,11 @@ class MemoryStore:
             loaded = json.loads(memory_path.read_text(encoding="utf-8"))
             state = json.loads(json.dumps(DEFAULT_MEMORY))
             state.update(loaded)
-            if "brain_state" in loaded and isinstance(loaded["brain_state"], dict):
-                state["brain_state"].update(loaded["brain_state"])
+
+            loaded_brain = loaded.get("brain_state", {}) if isinstance(loaded, dict) else {}
+            if isinstance(loaded_brain, dict):
+                state["brain_state"].update(loaded_brain)
+
             return cls(path=memory_path, state=state)
         return cls(path=memory_path)
 
@@ -43,3 +61,19 @@ class MemoryStore:
 
     def append_episode(self, episode: dict[str, Any]) -> None:
         self.state.setdefault("episodes", []).append(episode)
+
+    def now_context(self) -> dict[str, str]:
+        now = datetime.now()
+        return {
+            "iso": now.isoformat(timespec="seconds"),
+            "date": now.strftime("%Y-%m-%d"),
+            "time": now.strftime("%H:%M:%S"),
+            "weekday": now.strftime("%A"),
+        }
+
+    def current_age_years(self) -> int:
+        ident = self.brain_state.setdefault("identity", {})
+        birthday = ident.get("birthday", "2004-06-04")
+        born = date.fromisoformat(birthday)
+        today = date.today()
+        return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
